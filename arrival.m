@@ -1,3 +1,4 @@
+%With different arrival rate of SP 1
 clear
 close all
 arrival_set = [1,5,10,20,50,60,80,100];
