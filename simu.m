@@ -1,5 +1,6 @@
 load('arrival_and_energy.mat');
 
+%%%% Figure about resource utilization and allocated bandwidth with related to different value of arrival rate 0r time constraint of sp1
 % figure;
 % h = bar(y1,'stacked');
 % %applyhatch(gcf,'\x');
@@ -38,6 +39,7 @@ load('arrival_and_energy.mat');
 % set(gcf,'position',[x0,y0,width,height]);
 
 
+%%%% Figure about delay and power consumption with related to different value of time constraint of sp1
 
 % dl1_set = [0.005,0.01,0.02,0.05,0.1,0.2,0.5,1];
 % figure;
@@ -73,6 +75,11 @@ load('arrival_and_energy.mat');
 % height=250;
 % set(gcf,'position',[x0,y0,width,height]);
 % % 
+
+
+%%%% Figure about delay and power consumption with related to different value of arrival rate of sp1
+
+
 arrival_set = [1,5,10,20,50,60,80,100];
 
 figure;
