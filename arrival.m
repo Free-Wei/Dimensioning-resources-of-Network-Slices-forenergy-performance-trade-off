@@ -100,8 +100,8 @@ ObjFunc = @(x)w1*(x(1)+x(2)+x(3)+x(4)+x(5)+x(16)+x(17)+x(18)+x(19)+x(20))+(4.5+(
 fun2 = @(x)delay(x,dl1,dl2,LambdaMicrophones);
 
 
-opts = optimoptions('fmincon','Algorithm','sqp','ConstraintTolerance',1e-9);
-opts = optimoptions(opts,'MaxFunctionEvaluations',9e6,'MaxIterations',10000, 'StepTolerance',1e-9,'OptimalityTolerance',1e-9,'PlotFcn',{@optimplotx,@optimplotfval,@optimplotfirstorderopt}); % Recommended
+opts = optimoptions('fmincon','Algorithm','sqp','ConstraintTolerance',1e-12);
+opts = optimoptions(opts,'MaxFunctionEvaluations',9e6,'MaxIterations',10000, 'StepTolerance',1e-12,'OptimalityTolerance',1e-9,'PlotFcn',{@optimplotx,@optimplotfval,@optimplotfirstorderopt}); % Recommended
 
 [x,fval] = fmincon(ObjFunc,x0,A,b,[],[],x_range_min,x_range_max, fun2, opts);
 [res,] = delay(x,dl1,dl2,LambdaMicrophones);
