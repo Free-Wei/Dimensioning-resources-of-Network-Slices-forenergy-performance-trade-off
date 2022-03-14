@@ -1,21 +1,24 @@
+%With different time constraints of SP 1
 clear
 close all
 dl1_set = [0.005,0.01,0.02,0.05,0.1,0.2,0.5,1];
-%result_set = zeros(size(dl1_set,2),15,2);
-%fval_res = zeros(size(dl1_set,2));
+
 energy = zeros(size(dl1_set,2),1);
 energy1 = zeros(size(dl1_set,2),1);
 energy2 = zeros(size(dl1_set,2),1);
+
+%delay for each strategy:
 y1 = zeros(size(dl1_set,2),2);
 y2 = zeros(size(dl1_set,2),2);
 y3 = zeros(size(dl1_set,2),2);
 dl2 = 1;
-%arrival rate lambda = [1e4,2e4] pps
+
+
 for iter = 1:size(dl1_set,2)
     dl1 = dl1_set(iter);
+%arrival rate:
 LambdaMicrophones = 20;
-%arrival_app1 = random('Poisson', LambdaMicrophones,1,5);
-%arrival_app2 = random('Poisson', LambdaMicrophones,1,5);
+
 arrival_app1 = ones(1,5)*LambdaMicrophones;
 arrival_app2 = ones(1,5)*LambdaMicrophones;
 
@@ -39,8 +42,7 @@ total_app2 = arrival_app2*app2_path;
 
 
 %RV capacity of computational resources per node:
-%30 units of resources, one unit can handle 5kb kpps. so total is 1e8 kb.
-%each bit needs 1000 operationss
+%BW capacity of communication resources per link:
 
 RV = 1.2852e12;   %unit: IPS(instructions per second)
 BW = 1e10; % unit: 10Gb/s
@@ -69,19 +71,7 @@ x_range_max = [Coeff Coeff];
 B = diag(ones(1,15));
 A = [B B];
 b = Coeff';
-%% initialise x0\
-%n = ones(1,15)*5e6;
-%w1 = 0.999999;
-%w2 = 0.999999;
-% for i = 1:5
-%     x0(i) = (alpha1*total_app1(i) + sqrt(alpha1*n(i)*w1*(total_app1(i)/arrival_app1_inv)/(1-w1)))/1e8 +1e-6;
-%     x0(i+15) = (alpha2*total_app2(i) + sqrt(alpha2*n(i)*w2*(total_app2(i)/arrival_app2_inv)/(1-w2)))/1e8 +1e-6;
-% end
-% for i = 6:15
-%     x0(i) = (beta1*total_app1(i) + sqrt(beta1*n(i)*w1*(total_app1(i)/arrival_app1_inv)/(1-w1)))/1e8 +1e-6;
-%     x0(i+15) = (beta2*total_app2(i) + sqrt(beta2*n(i)*w2*(total_app2(i)/arrival_app2_inv)/(1-w2)))/1e8 +1e-6;
-% end
-% 
+%% initialise x0
 for i = 1:5
     x0(i) = (alpha1*total_app1(i)+1)/1e6;
     x0(i+15) = (alpha2*total_app2(i)+1)/1e6;
@@ -90,14 +80,12 @@ for i = 6:15
     x0(i) = (beta1*total_app1(i)+1)/1e6;
     x0(i+15) = (beta2*total_app2(i)+1)/1e6;
 end
-%x0 = (x_range_max+x_range_min)./2;
-%%normolize when given r = 1e11, time = 1s = 1000ms, so to get the same
-%%order, time needed * 1e8.   given bw = 1e9, time = 10ms, time needed
-%%*1e8
+%parameter for computing power consumption
 w1 = 42.29*1e6/RV;
 eps = 1e-4;
 w2 = 19.055;
 
+%Objective function
 ObjFunc = @(x)w1*(x(1)+x(2)+x(3)+x(4)+x(5)+x(16)+x(17)+x(18)+x(19)+x(20))+(4.5+(14.555/550)*(x(6)+x(21))).*((x(6)+x(21))>=0&(x(6)+x(21))<550)+(w2+eps*((x(6)+x(21))-550)).*((x(6)+x(21))>=550)+...
     (4.5+(14.555/550)*(x(7)+x(22))).*((x(7)+x(22))>=0&(x(7)+x(22))<550)+(w2+eps*((x(7)+x(22))-550)).*((x(7)+x(22))>=550)+...
     (4.5+(14.555/550)*(x(8)+x(23))).*((x(8)+x(23))>=0&(x(8)+x(23))<550)+(w2+eps*((x(8)+x(23))-550)).*((x(8)+x(23))>=550)+...
@@ -108,23 +96,8 @@ ObjFunc = @(x)w1*(x(1)+x(2)+x(3)+x(4)+x(5)+x(16)+x(17)+x(18)+x(19)+x(20))+(4.5+(
     (4.5+(14.555/550)*(x(13)+x(28))).*((x(13)+x(28))>=0&(x(13)+x(28))<550)+(w2+eps*((x(13)+x(28))-550)).*((x(13)+x(28))>=550)+...
     (4.5+(14.555/550)*(x(14)+x(29))).*((x(14)+x(29))>=0&(x(14)+x(29))<550)+(w2+eps*((x(14)+x(29))-550)).*((x(14)+x(29))>=550)+...
     (4.5+(14.555/550)*(x(15)+x(30))).*((x(15)+x(30))>=0&(x(15)+x(30))<550)+(w2+eps*((x(15)+x(30))-550)).*((x(15)+x(30))>=550);
-%ObjFunc = @(x)w1*(x(1)+x(2)+x(3)+x(4)+x(5)+x(16)+x(17)+x(18)+x(19)+x(20))+w2*20;
-fun2 = @(x)delay(x,dl1,dl2,LambdaMicrophones);
 
-%ObjFunc_2 = @(x,a,c,n)x;
-%ObjFunc = @(x,a,c,n)( w1*n*arrival_app1_inv*c/((1e8*x/a)-c))/1e8;
-%ObjFunc_2 = @(x,a,c,n)( w2*n*arrival_app2_inv*c/((1e8*x/a)-c))/1e8;
-%ObjFuncAll = @(x)...
-%     ObjFunc(x(1), alpha1, total_app1(1),n(1)) + ObjFunc(x(2), alpha1, total_app1(2),n(2)) + ObjFunc(x(3), alpha1, total_app1(3),n(3)) + ...
-%     ObjFunc(x(4), alpha1, total_app1(4),n(4)) + ObjFunc(x(5), alpha1, total_app1(5),n(5)) + ObjFunc(x(6), beta1, total_app1(6),n(6)) + ...
-%     ObjFunc(x(7), beta1, total_app1(7),n(7)) + ObjFunc(x(8), beta1, total_app1(8),n(8)) + ObjFunc(x(9), beta1, total_app1(9),n(9)) + ...
-%     ObjFunc(x(10), beta1, total_app1(10),n(10)) + ObjFunc(x(11), beta1, total_app1(11),n(11)) + ObjFunc(x(12), beta1, total_app1(12),n(12)) + ...
-%     ObjFunc(x(13), beta1, total_app1(13),n(13)) + ObjFunc(x(14), beta1, total_app1(14),n(14)) + ObjFunc(x(15), beta1, total_app1(15),n(15)) +...
-%     ObjFunc_2(x(16), alpha2, total_app2(1),n(1)) + ObjFunc_2(x(17), alpha2, total_app2(2),n(2)) + ObjFunc_2(x(18), alpha2, total_app2(3),n(3)) + ...
-%     ObjFunc_2(x(19), alpha2, total_app2(4),n(4)) + ObjFunc_2(x(20), alpha2, total_app2(5),n(5)) + ObjFunc_2(x(21), beta2, total_app2(6),n(6)) + ...
-%     ObjFunc_2(x(22), beta2, total_app2(7),n(7)) + ObjFunc_2(x(23), beta2, total_app2(8),n(8)) + ObjFunc_2(x(24), beta2, total_app2(9),n(9)) + ...
-%     ObjFunc_2(x(25), beta2, total_app2(10),n(10)) + ObjFunc_2(x(26), beta2, total_app2(11),n(11)) + ObjFunc_2(x(27), beta2, total_app2(12),n(12)) + ...
-%     ObjFunc_2(x(28), beta2, total_app2(13),n(13)) + ObjFunc_2(x(29), beta2, total_app2(14),n(14)) + ObjFunc_2(x(30), beta2, total_app2(15),n(15));
+fun2 = @(x)delay(x,dl1,dl2,LambdaMicrophones);
 
 opts = optimoptions('fmincon','Algorithm','sqp','ConstraintTolerance',1e-9);
 opts = optimoptions(opts,'MaxFunctionEvaluations',9e6,'MaxIterations',10000, 'StepTolerance',1e-9,'OptimalityTolerance',1e-9,'PlotFcn',{@optimplotx,@optimplotfval,@optimplotfirstorderopt}); % Recommended
@@ -145,60 +118,22 @@ for i = 6:15
 end
 [res_pro,] = delay(x1,dl1,dl2,LambdaMicrophones);
 
-% acc = 0;
-% acc_com = 0;
-% if res(1) <= dl1
-%     acc = acc + 1;
-% end 
-% if res(2) <= dl2
-%     acc = acc + 1;
-% end
-% 
-% if res_com(1) <= dl1
-%     acc_com = acc_com + 1;
-% end 
-% if res_com(2) <= dl2
-%     acc_com = acc_com + 1;
-% end
-
+%End-to-End delay for each strategy
 y1(iter,1) = res(1)+dl1;
 y1(iter,2) = res(2)+dl2;
 y2(iter,1) = res_com(1)+dl1;
 y2(iter,2) = res_com(2)+dl2;
 y3(iter,1) = res_pro(1)+dl1;
 y3(iter,2) = res_pro(2)+dl2;
-% for i = 1:15
-%     y1(i,1) = x(i)/Coeff(i);
-%     y1(i,2) = x(i+15)/Coeff(i);
-% end
 
-% figure;
-% bar(y1,'stacked');
-% set(gca,'XTickLabel',{'V1','V2','V3','V4','V5','V1-V2','V1-V3','V2-V1','V2-V5','V3-V1','V3-V4','V3-V5','V4-V3','V5-V2','V5-V3'});
-% title('total cost of resources and time');
-% xlabel('nodes and links');
-% ylabel('Cost');
-% legend('application 1', 'application 2');
 
-%fval_res(iter) = fval;
-%result_set(iter,:,:) = y1;
+%power consumption for MinRes and PropRes
 energy1(iter) = ObjFunc(x0);
 energy2(iter) = ObjFunc(x1);
 end
-%%
 
 
 
-
-%%
-% bar3_stacked(result_set)
-% xti = [1:1:8];
-% yti = [1:1:15];
-% xlabel('Deadline of application 1(per second)');
-% ylabel('Nodes and Links');
-% zlabel('resources utilization');
-% legend('application 1', 'application 2','Location','best');
-% set(gca,'xtick',xti,'XTickLabel', fliplr(dl1_set),'ytick',yti,'yticklabel',{'V1','V2','V3','V4','V5','V1-V2','V1-V3','V2-V1','V2-V5','V3-V1','V3-V4','V3-V5','V4-V3','V5-V2','V5-V3'})
 figure;
 plot(dl1_set,energy,'-k',dl1_set,energy1,'--k',dl1_set,energy2,':k');
 xlabel('Deadline of application 1 (per second)');
