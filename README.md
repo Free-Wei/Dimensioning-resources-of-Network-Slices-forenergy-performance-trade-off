@@ -12,4 +12,4 @@ Matlab v2021b
 ## Usage
 Run the script directly in Matlab.
 
-The routing and components placement are the same as our paper, which has 2 SPs with 5 ingress nodes. If you change the initial points, please adjust also 'StepTolerance' or 'ConstraintTolerance' to obtain local minimum. In our case, objective function is strictly increasing piecewise linear function and constraints are convex, so we believe that local minimum is global minimum.
+The routing and components placement are the same as our paper, which has 2 SPs with 5 ingress nodes. If you change the initial points, please check the parameters: 'StepTolerance' or 'ConstraintTolerance' of the matlab solver 'fmincon' and adjust them if necessary. If you have any questions, please contact wei.huang@telecom-sudparis.eu.
