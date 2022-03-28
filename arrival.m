@@ -42,14 +42,14 @@ total_app2 = arrival_app2*app2_path;
 %RV capacity of computational resources per node.
 %BW capacity of communication resources per link.
 
-RV = 1.2852e12;   %unit: operations 1000 operations/bit * 30 units * 20000 packets/s * 5000 bit/packets = 3e12 operations/s
-BW = 1e10; % unit: 1Gb/s
+RV = 1.2852e12;   %unit: CPU cycles
+BW = 1e10; % unit: 10Gb/s
 
-%beta: communication complexity :
+%beta: communication complexity : bit/packet
 beta1 = 85e3/2;
 beta2 = 85e3; 
 
-%alpha: computational complexity- operations/packets   5000 bit/packets * 1000 operations/bit
+%alpha: computational complexity- instrcutions/packet
 alpha1 = 3e9/2;  
 alpha2 = 3e9; 
 
