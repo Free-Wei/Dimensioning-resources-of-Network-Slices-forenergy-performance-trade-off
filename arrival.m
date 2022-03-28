@@ -42,7 +42,7 @@ total_app2 = arrival_app2*app2_path;
 %RV capacity of computational resources per node.
 %BW capacity of communication resources per link.
 
-RV = 1.2852e12;   %unit: CPU cycles
+RV = 1.2852e12;   %unit: IPS
 BW = 1e10; % unit: 10Gb/s
 
 %beta: communication complexity : bit/packet
